@@ -1,0 +1,73 @@
+COMO LIGAR A PLANILHA (uma vez só, uns 10 minutos)
+===================================================
+
+1. CRIAR A PLANILHA
+   - Abra drive.google.com > Novo > Planilhas Google > Planilha em branco.
+   - Dê o nome: Leads Larissa Johann.
+
+2. COLAR O CÓDIGO
+   - Na planilha: menu Extensões > Apps Script.
+   - Apague tudo o que aparecer no editor.
+   - Abra o arquivo Codigo.gs (desta pasta), copie tudo e cole no editor.
+   - Clique no disquete (Salvar).
+
+3. CRIAR AS ABAS
+   - Na barra de cima do editor, escolha a função "configurar" e clique em Executar.
+   - O Google pede autorização: Revisar permissões > escolha sua conta >
+     Avançado > Acessar (não seguro) > Permitir. (É normal: o código é seu.)
+   - Volte na planilha: aparecem as abas Painel, Leads, Fichas, Visitas, Eventos e Erros.
+
+4. TESTAR (opcional)
+   - No editor, escolha a função "testar" e clique em Executar.
+   - Deve aparecer 1 lead na aba Leads, 1 ficha na aba Fichas e 1 visita em Visitas.
+   - Depois apague essas linhas de teste.
+
+5. PUBLICAR
+   - No editor: Implantar > Nova implantação.
+   - Na engrenagem "Selecionar tipo", escolha App da Web.
+   - Executar como: Eu.   Quem pode acessar: Qualquer pessoa.
+   - Implantar. Copie a URL que termina em /exec.
+   - Teste: cole a URL no navegador. Deve aparecer {"ok":true,...}.
+
+6. COLAR NO SITE
+   - Abra index.html, procure por:   sheetUrl: "",
+   - Cole a URL entre as aspas:      sheetUrl: "https://script.google.com/macros/s/XXXX/exec",
+   - Salve e suba no GitHub.
+
+ATENÇÃO: se um dia mudar o Codigo.gs, use Implantar > Gerenciar implantações >
+lápis > Versão: Nova versão > Implantar. Assim a URL /exec continua a mesma.
+Se criar uma "Nova implantação", a URL muda e você terá de trocar no site.
+
+
+O QUE CADA ABA MOSTRA
+---------------------
+Painel   - números: visitas, visitantes únicos, popups abertos, leads, conversão,
+           Quentes/Mornos/Frios, cliques no WhatsApp, e tabelas por origem,
+           campanha e anúncio (UTM).
+Leads    - uma linha por lead, com todas as respostas, a nota (pontos/perfil),
+           as UTMs e a coluna "status" com lista (Novo, Em contato, Orçamento
+           enviado, Agendado, Fechado, Perdido). O WhatsApp vira link clicável.
+Fichas   - cada lead num bloco separado (Contato / Projeto / Qualificação / Origem),
+           o mais novo em cima. Bom para ler no celular.
+Visitas  - cada pessoa que abriu a página, com origem e UTMs.
+Eventos  - popup aberto, cada etapa do formulário, cliques no WhatsApp e Instagram.
+           Mostra onde as pessoas desistem.
+Erros    - se algo chegar quebrado, fica registrado aqui em vez de se perder.
+
+
+UTMs NOS ANÚNCIOS
+-----------------
+Use links assim (Meta Ads, campo "Parâmetros de URL"):
+utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}&utm_term={{adset.name}}
+
+Bio do Instagram:  https://lariink.com/?utm_source=instagram&utm_medium=bio
+Sem UTM, a página usa o site de onde a pessoa veio (ex.: google, instagram) ou "direto".
+A "primeira_origem" guarda por onde a pessoa chegou na PRIMEIRA vez, mesmo que volte depois por outro caminho.
+
+
+PIXEL DA META
+-------------
+No index.html, procure:   metaPixelId: "",
+Cole só o número do pixel: metaPixelId: "123456789012345",
+A página já dispara PageView, ViewContent/Contact nos botões e Lead ao enviar a aplicação.
+(O evento Lead leva o mesmo lead_id da planilha, útil para conferir depois.)
