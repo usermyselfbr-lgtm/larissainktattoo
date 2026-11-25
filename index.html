@@ -331,7 +331,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .g--6{grid-column:span 5;grid-row:span 1}
 /* 4 fotos verticais lado a lado */
 .g--t{grid-column:span 3;grid-row:span 3}
-.g--t img{object-position:center 40%}
+/* CORTE NO TOPO: esconde a barra do print (nome do arquivo).
+   --crop = quanto cortar do topo (.25 = 25%). A foto cresce para preencher o quadro. */
+.g--t{--crop:.25}
+.g--t img{position:absolute;left:0;right:0;bottom:0;width:100%;height:calc(100% / (1 - var(--crop)));object-fit:cover;object-position:center bottom}
+/* foto ampliada com o mesmo corte (tamanho calculado no script) */
+.lb img.crop-top{object-fit:cover;object-position:center bottom;max-height:none;height:auto}
 @media (max-width:860px){
   .gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:clamp(180px,48vw,320px)}
   .g--1,.g--2,.g--3,.g--4,.g--5,.g--6{grid-column:span 1;grid-row:span 1}
@@ -884,10 +889,10 @@ p,li{text-wrap:pretty}
     </div>
 
     <div class="gallery" id="gallery">
-      <button class="g g--t ph rv" data-label="Trabalho 45" data-cap="Realismo com geometria · Ombro"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.45.jpeg" alt="Tatuagem realista de cacique com mapa e elementos geométricos no ombro, por Larissa Johann" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo com geometria · Ombro</span></button>
-      <button class="g g--t ph rv rv-d1" data-label="Trabalho 46" data-cap="Realismo com geometria · Antebraço"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.46.jpeg" alt="Tatuagem de ampulheta, montanhas, fases da lua e árvore com geometria no antebraço" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo com geometria · Antebraço</span></button>
-      <button class="g g--t ph rv rv-d2" data-label="Trabalho 44" data-cap="Realismo · Antebraço"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.44.jpeg" alt="Tatuagem realista de anjo com esfera e árvore no antebraço" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo · Antebraço</span></button>
-      <button class="g g--t ph rv rv-d3" data-label="Trabalho 48" data-cap="Realismo com geometria · Antebraço"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.48.jpeg" alt="Tatuagem de porta para o cosmos, escada e coração anatômico com linhas geométricas no antebraço" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo com geometria · Antebraço</span></button>
+      <button data-crop="25" class="g g--t ph rv" data-label="Trabalho 45" data-cap="Realismo com geometria · Ombro"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.45.jpeg" alt="Tatuagem realista de cacique com mapa e elementos geométricos no ombro, por Larissa Johann" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo com geometria · Ombro</span></button>
+      <button data-crop="25" class="g g--t ph rv rv-d1" data-label="Trabalho 46" data-cap="Realismo com geometria · Antebraço"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.46.jpeg" alt="Tatuagem de ampulheta, montanhas, fases da lua e árvore com geometria no antebraço" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo com geometria · Antebraço</span></button>
+      <button data-crop="25" class="g g--t ph rv rv-d2" data-label="Trabalho 44" data-cap="Realismo · Antebraço"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.44.jpeg" alt="Tatuagem realista de anjo com esfera e árvore no antebraço" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo · Antebraço</span></button>
+      <button data-crop="25" class="g g--t ph rv rv-d3" data-label="Trabalho 48" data-cap="Realismo com geometria · Antebraço"><img src="https://raw.githubusercontent.com/usermyselfbr-lgtm/larissainktattoo/refs/heads/main/img/WhatsApp%20Image%202026-11-24%20at%2016.07.48.jpeg" alt="Tatuagem de porta para o cosmos, escada e coração anatômico com linhas geométricas no antebraço" loading="lazy" onerror="this.remove()"><span class="g__cap">Realismo com geometria · Antebraço</span></button>
     </div>
 
     <div class="gallery-foot rv">
@@ -1270,7 +1275,19 @@ const CONFIG = {
   const render = () => {
     const it = items[idx], img = $("img", it);
     media.innerHTML = "";
-    if (img) { const c = img.cloneNode(); c.removeAttribute("loading"); c.removeAttribute("onerror"); media.appendChild(c); }
+    if (img) {
+      const c = img.cloneNode(); c.removeAttribute("loading"); c.removeAttribute("onerror");
+      /* corte no topo também na foto ampliada (data-crop="25" no botão da galeria) */
+      const crop = (+it.dataset.crop || 0) / 100;
+      if (crop) {
+        const nr = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 0.46;
+        const R = (nr / (1 - crop)).toFixed(4);
+        c.classList.add("crop-top");
+        c.style.aspectRatio = R;
+        c.style.width = "min(88vw, calc((100vh - 170px) * " + R + "))";
+      }
+      media.appendChild(c);
+    }
     else { const d = document.createElement("div"); d.className = "lb__empty ph"; d.dataset.label = it.dataset.label; media.appendChild(d); }
     cap.textContent = it.dataset.cap + "  ·  " + (idx + 1) + "/" + items.length;
   };
