@@ -739,9 +739,27 @@ p,li{text-wrap:pretty}
 }
 @media (prefers-reduced-motion:reduce){.pop__box,.pop__veil,.pop__step.is-on{animation:none}}
 </style>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1471645895034058');
+fbq('track', 'PageView');
+</script>
+<!-- End Meta Pixel Code -->
 </head>
 
 <body>
+<noscript><img height="1" width="1" style="display:none" alt=""
+src="https://www.facebook.com/tr?id=1471645895034058&ev=PageView&noscript=1"
+/></noscript>
 <!-- Ícones reutilizáveis -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.8 5.2 11.4 12 12-6.8.6-11.4 5.2-12 12-.6-6.8-5.2-11.4-12-12C6.8 11.4 11.4 6.8 12 0Z"/></symbol>
@@ -1147,8 +1165,9 @@ p,li{text-wrap:pretty}
 const CONFIG = {
   whatsapp: "554598205848",
   whatsappMsg: "Olá, Larissa! Vim pelo seu site e quero fazer um orçamento de tatuagem.",
-  metaPixelId: "",   // ex.: "123456789012345" — deixe vazio para não carregar
-  ga4Id: ""          // ex.: "G-XXXXXXXXXX"   — deixe vazio para não carregar
+  metaPixelId: "",   // o Pixel 1471645895034058 já é carregado no <head> (com PageView); deixe vazio para não duplicar
+  pixelBotao: "Subscribe",   // evento disparado ao clicar nos botões de orçamento/aplicação (troque por "CompleteRegistration" se preferir)
+  ga4Id: ""        // ex.: "G-XXXXXXXXXX"   — deixe vazio para não carregar
 };
 
 (() => {
@@ -1184,7 +1203,11 @@ const CONFIG = {
   }
   const track = (name) => {
     const isWa = name.startsWith("whatsapp");
-    if (window.fbq) fbq("track", isWa ? "Contact" : "ViewContent", { content_name: name });
+    if (window.fbq) {
+      if (isWa) fbq("track", "Contact", { content_name: name });
+      else if (name.startsWith("cta_")) fbq("track", CONFIG.pixelBotao || "Subscribe", { content_name: name });
+      else fbq("track", "ViewContent", { content_name: name });
+    }
     if (window.gtag) gtag("event", isWa ? "contact_whatsapp" : "cta_click", { label: name });
   };
   document.addEventListener("click", e => { const t = e.target.closest("[data-track]"); if (t) track(t.dataset.track); });
